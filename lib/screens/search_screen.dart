@@ -25,17 +25,22 @@ class _SearchScreenState extends State<SearchScreen> {
   double _targetCalories = 2250;
   String _diet = 'None';
 
-  void _searchMealPlan() async {
-    MealPlan mealPlan = await APIService.instance.generateMealPlan(
-      targetCalories: _targetCalories.toInt(),
-      diet: _diet,
-    );
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => MealsScreen(mealPlan: mealPlan),
-      ),
-    );
+  Future<void> _searchMealPlan() async {
+    try {
+      MealPlan mealPlan = await APIService.instance.generateMealPlan(
+        targetCalories: _targetCalories.toInt(),
+        diet: _diet,
+      );
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => MealsScreen(mealPlan: mealPlan),
+        ),
+      );
+    } catch (error) {
+      // Handle error here
+      print('Error: $error');
+    }
   }
 
   @override
@@ -45,16 +50,14 @@ class _SearchScreenState extends State<SearchScreen> {
         decoration: BoxDecoration(
           image: DecorationImage(
             image: NetworkImage(
-              'https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80',
+              'https://i.imgur.com/9juGDyq.png',
             ),
             fit: BoxFit.cover,
           ),
         ),
         child: Center(
           child: Container(
-            margin: EdgeInsets.symmetric(
-              horizontal: 30.0,
-            ),
+            margin: EdgeInsets.symmetric(horizontal: 30.0),
             padding: EdgeInsets.symmetric(horizontal: 30.0),
             height: MediaQuery.of(context).size.height * 0.55,
             decoration: BoxDecoration(
@@ -65,7 +68,7 @@ class _SearchScreenState extends State<SearchScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  'Daily Meal Planner',
+                  'Paano Kaon: Meal Planner',
                   style: TextStyle(
                     fontSize: 32.0,
                     fontWeight: FontWeight.bold,
@@ -77,8 +80,8 @@ class _SearchScreenState extends State<SearchScreen> {
                   text: TextSpan(
                     style: Theme.of(context)
                         .textTheme
-                        .bodyText1
-                        .copyWith(fontSize: 25),
+                        .bodyText1!
+                        .copyWith(fontSize: 29),
                     children: [
                       TextSpan(
                         text: _targetCalories.truncate().toString(),
@@ -88,7 +91,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         ),
                       ),
                       TextSpan(
-                        text: ' cal',
+                        text: ' calories',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                         ),
@@ -106,9 +109,9 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 30.0),
-                  child: DropdownButtonFormField(
+                  child: DropdownButtonFormField<String>(
                     items: _diets.map((String priority) {
-                      return DropdownMenuItem(
+                      return DropdownMenuItem<String>(
                         value: priority,
                         child: Text(
                           priority,
@@ -125,7 +128,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                     onChanged: (value) {
                       setState(() {
-                        _diet = value;
+                        _diet = value!;
                       });
                     },
                     value: _diet,
